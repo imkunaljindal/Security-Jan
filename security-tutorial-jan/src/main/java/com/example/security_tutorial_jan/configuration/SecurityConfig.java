@@ -3,6 +3,8 @@ package com.example.security_tutorial_jan.configuration;
 import lombok.Setter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,36 +22,47 @@ public class SecurityConfig {
         httpSecurity.csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/home").permitAll()
+                .requestMatchers("/signup").permitAll()
                 .requestMatchers("/student").hasRole("STUDENT")
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin();
+                .httpBasic();
         return httpSecurity.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user1 = User.builder()
-                .username("kohli")
-                .password(passwordEncoder().encode("kohli123"))
-                .roles("STUDENT")
-                .build();
+//        UserDetails user1 = User.builder()
+//                .username("kohli")
+//                .password(passwordEncoder().encode("kohli123"))
+//                .roles("STUDENT")
+//                .build();
+//
+//        UserDetails user3 = User.builder()
+//                .username("bumrah")
+//                .password(passwordEncoder().encode("bumrah123"))
+//                .roles("STUDENT")
+//                .build();
+//
+//        UserDetails user2 = User.builder()
+//                .username("rohit")
+//                .password(passwordEncoder().encode("rohit123"))
+//                .roles("ADMIN")
+//                .build();
 
-        UserDetails user3 = User.builder()
-                .username("bumrah")
-                .password(passwordEncoder().encode("bumrah123"))
-                .roles("STUDENT")
-                .build();
+        return new CustomUserDetailsService();
 
-        UserDetails user2 = User.builder()
-                .username("rohit")
-                .password(passwordEncoder().encode("rohit123"))
-                .roles("ADMIN")
-                .build();
+      //  return new InMemoryUserDetailsManager(user2,user1,user3);
+    }
 
-        return new InMemoryUserDetailsManager(user2,user1,user3);
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
     }
 
     @Bean

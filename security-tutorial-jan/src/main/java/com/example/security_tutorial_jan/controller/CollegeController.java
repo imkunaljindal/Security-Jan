@@ -1,11 +1,15 @@
 package com.example.security_tutorial_jan.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.security_tutorial_jan.model.Person;
+import com.example.security_tutorial_jan.service.CollegeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CollegeController {
+
+    @Autowired
+    CollegeService collegeService;
 
     @GetMapping("/home")
     public String home() {
@@ -20,5 +24,10 @@ public class CollegeController {
     @GetMapping("/admin")
     public String admin() {
         return "Welcome to the ADMIN";
+    }
+
+    @PostMapping("/signup")
+    public String addPerson(@RequestBody Person person) {
+        return collegeService.addPerson(person);
     }
 }
